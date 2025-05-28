@@ -21,8 +21,8 @@ services:
       POSTGRES_DB: worktodoapp
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./db/tables.sql:/docker-entrypoint-initdb.d/tables.sql
-      - ./db/inserts.sql:/docker-entrypoint-initdb.d/inserts.sql
+      - ./db/01-tables.sql:/docker-entrypoint-initdb.d/01-tables.sql
+      - ./db/02-inserts.sql:/docker-entrypoint-initdb.d/02-inserts.sql
 
 volumes:
   db_data:

@@ -16,10 +16,6 @@ COPY . .
 # Add PostgreSQL client to execute SQL scripts
 RUN apt-get update && apt-get install -y postgresql-client
 
-# Copy SQL scripts to the container
-COPY db/tables.sql /docker-entrypoint-initdb.d/01-tables.sql
-COPY db/inserts.sql /docker-entrypoint-initdb.d/02-inserts.sql
-
 # Expose the port the app runs on
 EXPOSE 3000
 
