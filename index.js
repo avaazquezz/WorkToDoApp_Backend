@@ -1,22 +1,19 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-dotenv.config();
+require('dotenv').config();
+import express, { json } from 'express';
+import cors from 'cors';
 
 const app = express();
 const port = process.env.PORT || 3001;
 
 // Middlewares
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
-// Conexión a la base de datos
-const db = require('./db/db');
 
 // Rutas
-const projectRoutes = require('./routes/projects');
-const authRoutes = require('./routes/auth');
-const sectionRoutes = require('./routes/sections');
+import projectRoutes from './routes/projects';
+import authRoutes from './routes/auth';
+import sectionRoutes from './routes/sections';
 
 app.use('/api/projects', projectRoutes);
 app.use('/api/auth', authRoutes);

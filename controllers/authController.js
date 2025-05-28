@@ -6,7 +6,7 @@ const { hashPassword, comparePasswords } = require('../utils/hash');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-const SECRET = process.env.JWT_SECRET || "devsecret";
+const SECRET = process.env.JWT_SECRET;
 
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   throw new Error('GOOGLE_CLIENT_ID o GOOGLE_CLIENT_SECRET no están definidos en las variables de entorno.');
