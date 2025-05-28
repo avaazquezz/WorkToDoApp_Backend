@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      - NODE_ENV=development
+    command: "npm start"
+
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: worktodoapp
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db/01-tables.sql:/docker-entrypoint-initdb.d/01-tables.sql
+      - ./db/02-inserts.sql:/docker-entrypoint-initdb.d/02-inserts.sql
+
+volumes:
+  db_data:
