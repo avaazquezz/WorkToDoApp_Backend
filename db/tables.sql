@@ -1,8 +1,8 @@
 -- Crear tabla de usuarios
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(150) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   is_premium BOOLEAN DEFAULT FALSE
 );
@@ -10,7 +10,7 @@ CREATE TABLE users (
 -- Crear tabla de proyectos
 CREATE TABLE projects (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
+  name VARCHAR(255) NOT NULL,
   color VARCHAR(50),
   description TEXT,
   created_by INT NOT NULL,
