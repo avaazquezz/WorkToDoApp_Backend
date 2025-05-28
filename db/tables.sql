@@ -21,7 +21,7 @@ CREATE TABLE projects (
 -- Crear tabla de secciones
 CREATE TABLE sections (
   idSection INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(100) NOT NULL,
+  title VARCHAR(255) NOT NULL,
   description TEXT,
   color VARCHAR(50),
   createdAt BIGINT NOT NULL,
