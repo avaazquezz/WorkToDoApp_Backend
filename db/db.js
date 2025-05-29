@@ -1,25 +1,8 @@
-const mysql = require('mysql2');
+const postgres = require('postgres');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const connection = mysql.createConnection(process.env.MYSQL_URL);
+const connectionString = process.env.DATABASE_URL;
+const sql = postgres(connectionString, { ssl: 'require' }); // Habilitar SSL para Supabase
 
-/*
-
- conexion bbdd local 
-
- 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME
-});
-*/
-
-connection.connect((err) => {
-  if (err) throw err;
-  console.log('🟢 Conectado a la base de datos');
-});
-
-module.exports = connection;
+module.exports = sql;
