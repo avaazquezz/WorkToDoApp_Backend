@@ -17,11 +17,20 @@ router.get('/:userId', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
+    // Validar que el ID sea un número
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'El ID del proyecto debe ser un número válido' });
+    }
+
     const results = await sql`SELECT * FROM projects WHERE id = ${id}`;
-    if (results.length === 0) return res.status(404).json({ error: 'Proyecto no encontrado' });
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' });
+    }
+
     res.json(results[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Error interno del servidor', details: err.message });
   }
 });
 

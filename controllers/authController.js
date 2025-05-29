@@ -66,17 +66,26 @@ passport.deserializeUser((id, done) => {
 // Registrar usuario
 const register = async (req, res) => {
   const { name, email, password } = req.body;
-  const hashed = await hashPassword(password);
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
 
   try {
+    const hashed = await hashPassword(password);
+
     const [result] = await sql`
       INSERT INTO users (name, email, password)
       VALUES (${name}, ${email}, ${hashed})
       RETURNING id
     `;
-    res.status(201).json({ message: "Usuario registrado", userId: result.id });
+
+    res.status(201).json({ message: 'Usuario registrado', userId: result.id });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err.message.includes('duplicate key value')) {
+      return res.status(409).json({ error: 'El correo electrónico ya está registrado' });
+    }
+    res.status(500).json({ error: 'Error interno del servidor', details: err.message });
   }
 };
 
