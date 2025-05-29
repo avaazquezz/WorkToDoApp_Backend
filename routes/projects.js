@@ -14,7 +14,7 @@ router.get('/:userId', async (req, res) => {
 });
 
 // Obtener un proyecto por ID
-router.get('/project/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const results = await sql`SELECT * FROM projects WHERE id = ${id}`;

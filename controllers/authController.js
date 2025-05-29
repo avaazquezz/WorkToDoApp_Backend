@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const db = require('../db/db');
+const sql = require('../db/db');
 const jwt = require('jsonwebtoken');
 const { hashPassword, comparePasswords } = require('../utils/hash');
 const passport = require('passport');
@@ -68,25 +68,37 @@ const register = async (req, res) => {
   const { name, email, password } = req.body;
   const hashed = await hashPassword(password);
 
-  db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hashed], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    res.status(201).json({ message: "Usuario registrado", userId: result.insertId });
-  });
+  try {
+    const [result] = await sql`
+      INSERT INTO users (name, email, password)
+      VALUES (${name}, ${email}, ${hashed})
+      RETURNING id
+    `;
+    res.status(201).json({ message: "Usuario registrado", userId: result.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 // Login usuario
-const login = (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
-  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
-    if (err || results.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
 
-    const user = results[0];
+  try {
+    const [user] = await sql`
+      SELECT * FROM users WHERE email = ${email}
+    `;
+
+    if (!user) return res.status(401).json({ error: 'Usuario no encontrado' });
+
     const isMatch = await comparePasswords(password, user.password);
     if (!isMatch) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
     const token = jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: '7d' });
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, is_premium: user.is_premium } });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 module.exports = { register, login };

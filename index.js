@@ -11,13 +11,13 @@ app.use(express.json());
 
 
 // Rutas
-const projectRoutes = require('./routes/projects');
+const projectRoute = require('./routes/project');
 const authRoutes = require('./routes/auth');
-const sectionRoutes = require('./routes/sections');
+const sectionRoute = require('./routes/section');
 
-app.use('/api/projects', projectRoutes);
+app.use('/api/project', projectRoute);
 app.use('/api/auth', authRoutes);
-app.use('/api/sections', sectionRoutes);
+app.use('/api/section', sectionRoute);
 
 app.listen(port, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
