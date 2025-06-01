@@ -25,7 +25,7 @@ router.get('/:idSection', async (req, res) => {
   }
 });
 
-// Crear nueva sección
+// Crear nueva sección                 ------------------------ CORREGIR PORQUE DA ERROR 
 router.post('/', async (req, res) => {
   const { title, description, color, createdAt, project_id, user_id } = req.body;
   try {
@@ -65,7 +65,7 @@ router.delete('/:idSection', async (req, res) => {
   }
 });
 
-// Obtener información de creación de una sección
+// Obtener información de creación de una sección                      ----------------- CORREGIR PORQUE DA ERROR
 router.get('/:idSection/creation-info', async (req, res) => {
   const { idSection } = req.params;
   try {

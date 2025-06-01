@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const sql = require('../db/db');
+const pool = require('../db/db');
 const jwt = require('jsonwebtoken');
 const { hashPassword, comparePasswords } = require('../utils/hash');
 const passport = require('passport');
@@ -20,32 +20,24 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: '/api/auth/google/callback',
     },
-    (accessToken, refreshToken, profile, done) => {
+    async (accessToken, refreshToken, profile, done) => {
       const { id, displayName, emails } = profile;
       const email = emails[0].value;
-
-      // Buscar o crear usuario en la base de datos
-      db.query(
-        'SELECT * FROM users WHERE email = ?',
-        [email],
-        (err, results) => {
-          if (err) return done(err);
-
-          if (results.length > 0) {
-            return done(null, results[0]);
-          } else {
-            db.query(
-              'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-              [displayName, email, null],
-              (err, result) => {
-                if (err) return done(err);
-                const newUser = { id: result.insertId, name: displayName, email };
-                return done(null, newUser);
-              }
-            );
-          }
+      try {
+        const [results] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        if (results.length > 0) {
+          return done(null, results[0]);
+        } else {
+          const [result] = await pool.query(
+            'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+            [displayName, email, null]
+          );
+          const newUser = { id: result.insertId, name: displayName, email };
+          return done(null, newUser);
         }
-      );
+      } catch (err) {
+        return done(err);
+      }
     }
   )
 );
@@ -56,11 +48,13 @@ passport.serializeUser((user, done) => {
 });
 
 // Deserializar usuario
-passport.deserializeUser((id, done) => {
-  db.query('SELECT * FROM users WHERE id = ?', [id], (err, results) => {
-    if (err) return done(err);
+passport.deserializeUser(async (id, done) => {
+  try {
+    const [results] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
     done(null, results[0]);
-  });
+  } catch (err) {
+    done(err);
+  }
 });
 
 // Registrar usuario
@@ -73,16 +67,13 @@ const register = async (req, res) => {
 
   try {
     const hashed = await hashPassword(password);
-
-    const [result] = await sql`
-      INSERT INTO users (name, email, password)
-      VALUES (${name}, ${email}, ${hashed})
-      RETURNING id
-    `;
-
-    res.status(201).json({ message: 'Usuario registrado', userId: result.id });
+    const [result] = await pool.query(
+      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+      [name, email, hashed]
+    );
+    res.status(201).json({ message: 'Usuario registrado', userId: result.insertId });
   } catch (err) {
-    if (err.message.includes('duplicate key value')) {
+    if (err.code === 'ER_DUP_ENTRY') {
       return res.status(409).json({ error: 'El correo electrónico ya está registrado' });
     }
     res.status(500).json({ error: 'Error interno del servidor', details: err.message });
@@ -94,10 +85,8 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const [user] = await sql`
-      SELECT * FROM users WHERE email = ${email}
-    `;
-
+    const [results] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    const user = results[0];
     if (!user) return res.status(401).json({ error: 'Usuario no encontrado' });
 
     const isMatch = await comparePasswords(password, user.password);

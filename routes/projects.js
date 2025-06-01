@@ -72,7 +72,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Obtener información de creación de un proyecto
+// Obtener información de creación de un proyecto  --------------------------    CORREGIR PORQUE DA ERROR  
 router.get('/project/:id/creation-info', async (req, res) => {
   const { id } = req.params;
   try {
@@ -87,7 +87,7 @@ router.get('/project/:id/creation-info', async (req, res) => {
   }
 });
 
-// Obtener estadísticas de proyectos
+// Obtener estadísticas de proyectos          --------------------------    CORREGIR PORQUE DA ERROR 
 router.get('/stats', async (req, res) => {
   try {
     const [results] = await pool.query(
