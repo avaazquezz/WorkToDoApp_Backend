@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "aqui se gestiona las apis y bbdd de la app WorkToDo",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avaazquezz/WorkToDoApp_Backend.git"
@@ -28,8 +24,6 @@
     "mysql2": "^3.14.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "pg": "^8.16.0",
-    "postgres": "^3.4.7",
     "worktodoapp_backend": "file:"
   },
   "devDependencies": {
