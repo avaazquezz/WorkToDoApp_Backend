@@ -3,7 +3,7 @@ const router = express.Router();
 const pool = require('../db/db');
 
 // 📥 Crear una nueva nota
-router.post('/notes', async (req, res) => {
+router.post('/new', async (req, res) => {
   const { title, section_id, user_id } = req.body;
   const created_at = Date.now();
 
@@ -23,7 +23,7 @@ router.post('/notes', async (req, res) => {
 });
 
 // 📄 Obtener todas las notas de una sección
-router.get('/notes/:sectionId', async (req, res) => {
+router.get('/section/:sectionId', async (req, res) => {
   const { sectionId } = req.params;
 
   try {
@@ -38,7 +38,7 @@ router.get('/notes/:sectionId', async (req, res) => {
 });
 
 // 📝 Editar el título de una nota
-router.put('/notes/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { title } = req.body;
   const { id } = req.params;
   const updated_at = Date.now();
@@ -55,7 +55,7 @@ router.put('/notes/:id', async (req, res) => {
 });
 
 // 🗑️ Eliminar una nota (y sus todos)
-router.delete('/notes/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -66,8 +66,8 @@ router.delete('/notes/:id', async (req, res) => {
   }
 });
 
-// ➕ Añadir un ToDo a una nota (máx. 8)
-router.post('/notes/:noteId/todos', async (req, res) => {
+// ➕ Añadir un ToDo a una nota (máx. 8)          
+router.post('/:noteId/todos', async (req, res) => {
   const { content } = req.body;
   const { noteId } = req.params;
 
@@ -97,7 +97,7 @@ router.post('/notes/:noteId/todos', async (req, res) => {
 });
 
 // 📃 Obtener todos los ToDos de una nota
-router.get('/notes/:noteId/todos', async (req, res) => {
+router.get('/:noteId/todos', async (req, res) => {
   const { noteId } = req.params;
 
   try {
@@ -140,7 +140,7 @@ router.delete('/todos/:id', async (req, res) => {
 });
 
 // 🔀 Reordenar ToDos de una nota
-router.put('/notes/:noteId/todos/reorder', async (req, res) => {
+router.put('/:noteId/todos/reorder', async (req, res) => {
   const { noteId } = req.params;
   const { todoIds } = req.body;
 
