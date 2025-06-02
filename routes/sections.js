@@ -65,7 +65,7 @@ router.delete('/:idSection', async (req, res) => {
   }
 });
 
-// Obtener información de creación de una sección                      ----------------- CORREGIR PORQUE DA ERROR
+// Obtener información de creación de una sección
 router.get('/:idSection/creation-info', async (req, res) => {
   const { idSection } = req.params;
   try {
@@ -73,10 +73,13 @@ router.get('/:idSection/creation-info', async (req, res) => {
       'SELECT sections.createdAt, users.name AS created_by FROM sections JOIN users ON sections.user_id = users.id WHERE sections.idSection = ?',
       [idSection]
     );
-    if (results.length === 0) return res.status(404).json({ error: 'Información de creación no encontrada' });
+    if (!results || results.length === 0) {
+      return res.status(404).json({ error: 'Información de creación no encontrada' });
+    }
     res.json(results[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Database Query Error:', err); // Log para depuración
+    res.status(500).json({ error: 'Error interno del servidor', details: err.message });
   }
 });
 
