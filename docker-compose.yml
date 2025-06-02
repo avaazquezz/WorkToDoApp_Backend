@@ -1,14 +1,14 @@
+version: "3.8"
+
 services:
   app:
     build: .
     ports:
       - "3000:3000"
-    volumes:
-      - .:/usr/src/app
     environment:
       - DB_HOST=db
       - DB_USER=root
-      - DB_PASSWORD=1234
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=worktodo
     depends_on:
       db:
@@ -19,10 +19,8 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: worktodo
-    ports:
-      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./db:/docker-entrypoint-initdb.d

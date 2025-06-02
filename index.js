@@ -14,10 +14,12 @@ app.use(express.json());
 const projectRoutes = require('./routes/projects');
 const authRoutes = require('./routes/auth');
 const sectionRoutes = require('./routes/sections');
+const notesRoutes = require('./routes/ToDo.js');
 
 app.use('/api/projects', projectRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/sections', sectionRoutes);
+app.use('/api/notes', notesRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${port}`);

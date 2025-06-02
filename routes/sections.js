@@ -25,7 +25,7 @@ router.get('/:idSection', async (req, res) => {
   }
 });
 
-// Crear nueva sección                 ------------------------ CORREGIR PORQUE DA ERROR 
+// Crear nueva sección                 ------------------------ COMPROBAR 
 router.post('/', async (req, res) => {
   const { title, description, color, createdAt, project_id, user_id } = req.body;
   try {
