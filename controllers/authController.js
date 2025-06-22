@@ -57,7 +57,7 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Registrar usuario
+// Registrar usuario BACKEND
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 

@@ -25,11 +25,22 @@ router.get('/user/:userId', async (req, res) => {
 router.post('/', async (req, res) => {
   const { name, color, created_by } = req.body;
   const created_at = Date.now();
+
   try {
+    // Buscar el correo electrónico del usuario en la base de datos
+    const [userResult] = await pool.query('SELECT email FROM users WHERE id = ?', [created_by]);
+    if (userResult.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const userEmail = userResult[0].email;
+
+    // Insertar el proyecto con el correo electrónico del usuario
     const [result] = await pool.query(
       'INSERT INTO projects (name, color, created_by, created_at) VALUES (?, ?, ?, ?)',
-      [name, color, created_by, created_at]
+      [name, color, userEmail, created_at]
     );
+
     res.status(201).json({ id: result.insertId, message: 'Proyecto creado exitosamente' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -68,6 +79,7 @@ router.delete('/:id', async (req, res) => {
 
 // ---------------------------
 // OBTENER INFO DE CREACIÓN DE UN PROYECTO
+// Usuario que ha creado el proyecto y fecha de creación
 // ---------------------------
 router.get('/:id/creation-info', async (req, res) => {
   const { id } = req.params;
