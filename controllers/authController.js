@@ -3,6 +3,7 @@ require('dotenv').config();
 const pool = require('../db/db');
 const jwt = require('jsonwebtoken');
 const { hashPassword, comparePasswords } = require('../utils/hash');
+const logger = require('../utils/logger'); // Agregar un logger
 const SECRET = process.env.JWT_SECRET;
 
 // Registrar usuario
@@ -25,6 +26,7 @@ const register = async (req, res) => {
       user: { id: result.insertId, name, email }
     });
   } catch (err) {
+    logger.error('Error en el registro:', err); // Log detallado
     if (err.code === 'ER_DUP_ENTRY') {
       return res.status(409).json({ error: 'El correo electrónico ya está registrado' });
     }
@@ -49,6 +51,7 @@ const login = async (req, res) => {
       user: { id: user.id, name: user.name, email: user.email, is_premium: user.is_premium }
     });
   } catch (err) {
+    logger.error('Error en el login:', err); // Log detallado
     return res.status(500).json({ error: err.message });
   }
 };
