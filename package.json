@@ -24,6 +24,7 @@
     "mysql2": "^3.14.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "winston": "^3.8.2",
     "worktodoapp_backend": "file:"
   },
   "devDependencies": {

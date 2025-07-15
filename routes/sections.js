@@ -25,9 +25,18 @@ router.get('/:idSection', async (req, res) => {
   }
 });
 
-// Crear nueva sección                 ------------------------ COMPROBAR 
+// Crear nueva sección               
 router.post('/', async (req, res) => {
   const { title, description, color, createdAt, project_id, user_id } = req.body;
+
+  // Validar datos recibidos
+  if (!title || !description || !color || !createdAt || !project_id || !user_id) {
+    console.error('Error de validación: Faltan campos obligatorios.', req.body); // Log detallado
+    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  }
+
+  console.log('Datos recibidos para crear sección:', req.body); // Log para depuración
+
   try {
     const [result] = await pool.query(
       'INSERT INTO sections (title, description, color, createdAt, project_id, user_id) VALUES (?, ?, ?, ?, ?, ?)',
@@ -35,7 +44,8 @@ router.post('/', async (req, res) => {
     );
     res.status(201).json({ idSection: result.insertId });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error al insertar sección en la base de datos:', err.message, err.stack); // Log más detallado
+    res.status(500).json({ error: 'Error interno del servidor.', details: err.message });
   }
 });
 

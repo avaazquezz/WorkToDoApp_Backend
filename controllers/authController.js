@@ -6,6 +6,10 @@ const { hashPassword, comparePasswords } = require('../utils/hash');
 const logger = require('../utils/logger'); // Agregar un logger
 const SECRET = process.env.JWT_SECRET;
 
+if (!SECRET) {
+  throw new Error('JWT_SECRET no está configurado en el archivo .env');
+}
+
 // Registrar usuario
 const register = async (req, res) => {
   const { name, email, password } = req.body;

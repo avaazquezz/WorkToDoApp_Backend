@@ -10,6 +10,9 @@ RUN npm install
 
 COPY . .
 
+# Copiar archivo .env
+COPY .env .env
+
 # Exponer el puerto de la app
 EXPOSE 3001
 
