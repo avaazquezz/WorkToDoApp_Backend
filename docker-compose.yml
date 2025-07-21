@@ -5,38 +5,6 @@ services:
     build: .
     ports:
       - "3001:3001"
-    environment:
-      DB_HOST: db
-      DB_USER: root
-      DB_PASSWORD: 1234
-      DB_NAME: worktodo
-    depends_on:
-      db:
-        condition: service_healthy
+    env_file:
+      - .env
     restart: always
-
-  db:
-    image: mysql:8.0
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: worktodo
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-
-volumes:
-  db_data:
