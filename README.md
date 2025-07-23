@@ -88,21 +88,40 @@ http://localhost:3001/health
 
 The backend exposes the following API endpoints:
 
-- **Authentication**
-  - `POST /api/auth/register`: Register a new user.
-  - `POST /api/auth/login`: Log in an existing user.
+#### **Authentication**
+- `POST /api/auth/register`: Register a new user.
+- `POST /api/auth/login`: Log in an existing user.
 
-- **Projects**
-  - `GET /api/projects`: Fetch all projects.
-  - `POST /api/projects`: Create a new project.
+#### **Projects**
+- `GET /api/projects/user/:userId`: Fetch all projects for a specific user.
+- `POST /api/projects`: Create a new project.
+- `PUT /api/projects/:id`: Update a project.
+- `DELETE /api/projects/:id`: Delete a project.
+- `GET /api/projects/:id/creation-info`: Get creation info for a project.
+- `GET /api/projects/:id`: Fetch a project by ID.
 
-- **Sections**
-  - `GET /api/sections`: Fetch all sections.
-  - `POST /api/sections`: Create a new section.
+#### **Sections**
+- `GET /api/sections/project/:projectId`: Fetch all sections for a specific project.
+- `GET /api/sections/:idSection`: Fetch a section by ID.
+- `POST /api/sections`: Create a new section.
+- `PUT /api/sections/:idSection`: Update a section.
+- `DELETE /api/sections/:idSection`: Delete a section.
+- `GET /api/sections/:idSection/creation-info`: Get creation info for a section.
+- `PUT /api/sections/:idSection/move`: Move a section to another project.
+- `GET /api/sections/project/:projectId/count`: Count sections in a project.
 
-- **ToDo**
-  - `GET /api/notes`: Fetch all notes.
-  - `POST /api/notes`: Create a new note.
+#### **Notes**
+- `POST /api/notes/new`: Create a new note.
+- `GET /api/notes/section/:sectionId`: Fetch all notes for a specific section.
+- `PUT /api/notes/:id`: Update a note's title.
+- `DELETE /api/notes/:id`: Delete a note.
+
+#### **ToDos**
+- `POST /api/notes/:noteId/todos`: Add a ToDo to a note (max 8).
+- `GET /api/notes/:noteId/todos`: Fetch all ToDos for a note.
+- `PUT /api/notes/todos/:id`: Update a ToDo (mark as completed or edit content).
+- `DELETE /api/notes/todos/:id`: Delete a ToDo.
+- `PUT /api/notes/:noteId/todos/reorder`: Reorder ToDos for a note.
 
 ### 6. Database Management
 
