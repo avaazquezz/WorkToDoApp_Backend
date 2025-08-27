@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  tests:
+    build:
+      context: .
+      target: test
+    environment:
+      DB_HOST: test-db
+      DB_USER: root
+      DB_PASSWORD: 1234
+      DB_NAME: worktodo_test
+      NODE_ENV: test
+      JWT_SECRET: test_jwt_secret_key
+    depends_on:
+      test-db:
+        condition: service_healthy
+    # Run Jest with detectOpenHandles to surface leaked async handles
+    # and --runInBand to avoid worker processes staying alive in Docker
+    command: "npm test -- --detectOpenHandles --runInBand"
+    volumes:
+      - ./coverage:/usr/src/app/coverage
+
+  test-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: worktodo_test
+    volumes:
+      - ./db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
