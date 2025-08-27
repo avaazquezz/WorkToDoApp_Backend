@@ -3,7 +3,7 @@ const request = require('supertest');
 const express = require('express');
 const mysql = require('mysql2/promise');
 const authRoutes = require('../../routes/auth');
-const { cleanTestDb, testDbConfig } = require('../helpers/testDb');
+const { cleanTestDb, testDbConfig, closePool } = require('../helpers/testDb');
 const { validUserData } = require('../helpers/fixtures');
 
 // Create test app
@@ -29,7 +29,7 @@ describe('Auth Routes Integration Tests', () => {
 
   afterAll(async () => {
     if (testPool) {
-      await testPool.end();
+      await closePool(testPool);
     }
   });
 

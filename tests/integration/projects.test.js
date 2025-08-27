@@ -3,7 +3,7 @@ const request = require('supertest');
 const express = require('express');
 const mysql = require('mysql2/promise');
 const projectRoutes = require('../../routes/projects');
-const { cleanTestDb, testDbConfig } = require('../helpers/testDb');
+const { cleanTestDb, testDbConfig, closePool } = require('../helpers/testDb');
 const { createTestUser, validProjectData } = require('../helpers/fixtures');
 
 // Create test app
@@ -38,7 +38,7 @@ describe('Projects Routes Integration Tests', () => {
 
   afterAll(async () => {
     if (testPool) {
-      await testPool.end();
+      await closePool(testPool);
     }
   });
 
@@ -95,7 +95,7 @@ describe('Projects Routes Integration Tests', () => {
       await request(app)
         .post('/api/projects')
         .send(invalidProjectData)
-        .expect(500); // Database constraint error
+        .expect(400); // Missing required fields should return 400
     });
   });
 

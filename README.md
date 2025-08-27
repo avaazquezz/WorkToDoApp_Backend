@@ -78,24 +78,17 @@ Replace `your_jwt_secret` with your actual values.
 
 ### 3. Build and Run the Application
 
-#### Production Mode (with Automated Testing)
+#### Production Mode
 
-Use Docker Compose to build and start the application. **Tests will run automatically before the application starts:**
+Use Docker Compose to build and start the backend and database services:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
-This will:
-1. **Run comprehensive tests** against a separate test database
-2. **Only start the application** if all tests pass
-3. Generate test coverage reports in the `./coverage` directory
-
-Services started:
-- **tests**: Automated test suite with coverage reporting
+This will start:
 - **app**: The backend application running on `http://localhost:3001`
 - **db**: Production MySQL database
-- **test-db**: Separate MySQL database for testing
 - **adminer**: Database management tool accessible at `http://localhost:8080`
 
 #### Development Mode (with Hot Reload)
@@ -103,7 +96,7 @@ Services started:
 For development with automatic code reloading:
 
 ```bash
-docker-compose -f docker-compose.dev.yml up --build
+docker compose -f docker-compose.dev.yml up --build
 ```
 
 This provides:
@@ -113,11 +106,18 @@ This provides:
 
 #### Testing Only
 
-To run only the test suite:
+To run the comprehensive test suite in an isolated environment:
 
 ```bash
-docker-compose -f docker-compose.test.yml up --build
+docker compose -f docker-compose.test.yml up --abort-on-container-exit --build
 ```
+
+This will:
+- Create a separate test database (`worktodo_test`)
+- Run all unit and integration tests
+- Generate test coverage reports
+- Automatically exit when tests complete
+- Use `--detectOpenHandles` to prevent resource leaks
 
 #### Local Development (without Docker)
 
@@ -202,16 +202,33 @@ You can manage the database using Adminer at `http://localhost:8080`. Use the fo
 
 ## Testing
 
-This project includes a comprehensive testing suite with both unit and integration tests.
+This project includes a comprehensive testing suite with both unit and integration tests, optimized for Docker environments.
 
 ### Test Features
 
-- **Automated Testing**: Tests run automatically when using `docker-compose up`
+- **Docker-First Testing**: Tests designed to run in containerized environments
+- **Open Handle Detection**: Configured with `--detectOpenHandles` to prevent memory leaks
+- **Database Isolation**: Tests use a separate database (`worktodo_test`) to avoid conflicts
+- **Connection Management**: Proper teardown of database connections and resources
 - **Test Coverage**: Generates detailed coverage reports
-- **Database Isolation**: Tests use a separate database to avoid conflicts
 - **CI/CD Ready**: Configured for continuous integration
 
-### Test Commands
+### Running Tests
+
+#### With Docker (Recommended)
+
+```bash
+# Run tests only (isolated testing environment)
+docker compose -f docker-compose.test.yml up --abort-on-container-exit --build
+
+# Production with backend and database (tests run separately)
+docker compose up --build
+
+# Development mode with hot reload
+docker compose -f docker-compose.dev.yml up --build
+```
+
+#### Local Development
 
 ```bash
 # Run all tests
@@ -232,23 +249,26 @@ npm run test:coverage
 
 ### Test Structure
 
-- **Unit Tests**: Test individual functions and components in isolation
-- **Integration Tests**: Test complete API endpoints with real database connections
+- **Unit Tests** (`tests/unit/`): Test individual functions and components in isolation
+- **Integration Tests** (`tests/integration/`): Test complete API endpoints with real database connections
+- **Test Helpers** (`tests/helpers/`): Utilities for test setup, fixtures, and database management
 - **Test Database**: Separate MySQL database (`worktodo_test`) for testing
 - **Coverage Reports**: Generated in `./coverage` directory
 
-### Docker Test Configurations
+### Test Configuration Highlights
 
-```bash
-# Production with tests (default)
-docker-compose up --build
+- **Jest Configuration**: Optimized with `--detectOpenHandles` and `--runInBand` for reliable execution
+- **Database Connection Pooling**: Lazy initialization to prevent resource leaks
+- **Proper Teardown**: All tests properly close database connections in `afterAll` blocks
+- **Environment Separation**: Test and production databases are completely isolated
 
-# Development mode
-docker-compose -f docker-compose.dev.yml up --build
+### Docker Test Services
 
-# Tests only
-docker-compose -f docker-compose.test.yml up --build
-```
+The `docker-compose.test.yml` includes:
+
+- **test-db**: MySQL database specifically for testing
+- **tests**: Jest test runner with open handle detection
+- **Isolated Environment**: No interference with production services
 
 ## Development Workflow
 
@@ -260,24 +280,30 @@ docker-compose -f docker-compose.test.yml up --build
 
 2. **Development**:
    ```bash
-   # Start development environment
-   docker-compose -f docker-compose.dev.yml up --build
+   # Start development environment with hot reload
+   docker compose -f docker-compose.dev.yml up --build
    ```
 
 3. **Testing**:
    ```bash
-   # Run tests locally
-   npm test
+   # Run tests in isolated Docker environment (recommended)
+   docker compose -f docker-compose.test.yml up --abort-on-container-exit --build
    
-   # Or run tests in Docker
-   docker-compose -f docker-compose.test.yml up --build
+   # Or run tests locally
+   npm test
    ```
 
 4. **Production Deployment**:
    ```bash
-   # This will run tests first, then start the application
-   docker-compose up --build
+   # Start backend and database services
+   docker compose up --build
    ```
+
+### Docker Compose Files Overview
+
+- **`docker-compose.yml`**: Production backend and database services
+- **`docker-compose.dev.yml`**: Development environment with hot reload
+- **`docker-compose.test.yml`**: Isolated testing environment with test database
 
 ## Quick Commands (Makefile)
 
@@ -295,18 +321,28 @@ make dev              # Start development with Docker
 make dev-local        # Start development locally
 
 # Testing
-make test             # Run tests with Docker
+make test             # Run tests in isolated Docker environment
 make test-local       # Run tests locally
 make test-coverage    # Generate coverage report
 
 # Production
-make prod             # Start production (with tests)
-make prod-no-tests    # Start production (skip tests)
-
-# Utilities
+make prod             # Start production backend and database
 make clean            # Clean containers and volumes
 make logs             # Show application logs
 make health           # Check application health
+```
+
+### Docker Compose Command Reference
+
+```bash
+# Backend and database services
+docker compose up --build
+
+# Development with hot reload
+docker compose -f docker-compose.dev.yml up --build
+
+# Isolated testing environment
+docker compose -f docker-compose.test.yml up --abort-on-container-exit --build
 ```
 
 ## Contributing

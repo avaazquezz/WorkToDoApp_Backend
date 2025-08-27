@@ -62,8 +62,10 @@ const validProjectData = {
   name: 'New Project',
   color: '#7D3C98',
   description: 'A new test project',
-  created_by: 1
+  created_by: 1,
+  created_at: Date.now()
 };
+
 
 const invalidProjectData = [
   { name: '', color: '#7D3C98', description: 'Test', created_by: 1 },

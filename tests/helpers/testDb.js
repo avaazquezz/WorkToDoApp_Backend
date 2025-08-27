@@ -115,10 +115,16 @@ const dropTestDb = async () => {
   await connection.end();
 };
 
+// Close the pool of connections
+const closePool = async (pool) => {
+  await pool.end();
+};
+
 module.exports = {
   testDbConfig,
   createTestDb,
   setupTestTables,
   cleanTestDb,
-  dropTestDb
+  dropTestDb,
+  closePool
 };

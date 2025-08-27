@@ -2,18 +2,50 @@ const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+// Lazy pool wrapper: do NOT create a pool at require-time.
+// When running tests, `tests/setup.js` sets `global.testPool` and
+// the wrapper will delegate queries to that pool. In production
+// the wrapper will create a real pool on first use.
 
-pool.on('error', (err) => {
-  console.error('Error en la conexión a la base de datos:', err);
-});
+let internalPool = null;
 
-module.exports = pool;
+const createInternalPool = () => {
+  if (internalPool) return internalPool;
+  internalPool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  });
+
+  internalPool.on('error', (err) => {
+    console.error('Error en la conexi\u00f3n a la base de datos:', err);
+  });
+
+  return internalPool;
+};
+
+const getPool = () => {
+  // Prefer a test pool created by the test harness
+  if (typeof global !== 'undefined' && global.testPool) return global.testPool;
+  return createInternalPool();
+};
+
+// Minimal proxy exposing execute/query methods used across the codebase.
+// This keeps existing call sites (pool.query(...)) working.
+const poolProxy = {
+  query: (...args) => getPool().query(...args),
+  execute: (...args) => getPool().execute(...args),
+  // allow explicit shutdown of the internal pool if needed
+  end: async () => {
+    if (internalPool) {
+      await internalPool.end();
+      internalPool = null;
+    }
+  }
+};
+
+module.exports = poolProxy;

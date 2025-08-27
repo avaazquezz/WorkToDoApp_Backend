@@ -3,7 +3,7 @@ const request = require('supertest');
 const express = require('express');
 const mysql = require('mysql2/promise');
 const notesRoutes = require('../../routes/ToDo');
-const { cleanTestDb, testDbConfig } = require('../helpers/testDb');
+const { cleanTestDb, testDbConfig, closePool } = require('../helpers/testDb');
 const { createTestUser, createTestProject, createTestSection, createTestNote } = require('../helpers/fixtures');
 
 // Create test app
@@ -56,7 +56,7 @@ describe('Notes/ToDos Routes Integration Tests', () => {
 
   afterAll(async () => {
     if (testPool) {
-      await testPool.end();
+      await closePool(testPool);
     }
   });
 

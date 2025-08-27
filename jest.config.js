@@ -22,7 +22,6 @@ module.exports = {
     '/dist/'
   ],
   verbose: true,
-  forceExit: true,
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true

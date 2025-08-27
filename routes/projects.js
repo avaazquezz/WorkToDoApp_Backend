@@ -34,6 +34,10 @@ router.get('/user/:userId', async (req, res) => {
 // ---------------------------
 router.post('/', async (req, res) => {
   const { name, color, description = '', created_by } = req.body;
+  // Validate required fields
+  if (!name || !created_by) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios' });
+  }
   const created_at = Date.now();
 
   try {

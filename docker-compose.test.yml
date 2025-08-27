@@ -15,7 +15,9 @@ services:
     depends_on:
       test-db:
         condition: service_healthy
-    command: npm test
+    # Run Jest with detectOpenHandles to surface leaked async handles
+    # and --runInBand to avoid worker processes staying alive in Docker
+    command: "npm test -- --detectOpenHandles --runInBand"
     volumes:
       - ./coverage:/usr/src/app/coverage
 
