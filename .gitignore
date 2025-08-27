@@ -4,3 +4,17 @@
 /.env.local
 /.env.prod
 /docker-compose_local.yml
+
+# Test files
+/coverage
+*.log
+.nyc_output
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker volumes data
+*_data/
