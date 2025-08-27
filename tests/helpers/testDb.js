@@ -95,11 +95,25 @@ const setupTestTables = async (pool) => {
 // Clean test database
 const cleanTestDb = async (pool) => {
   await pool.execute('SET FOREIGN_KEY_CHECKS = 0');
-  await pool.execute('TRUNCATE TABLE note_todos');
-  await pool.execute('TRUNCATE TABLE notes');
-  await pool.execute('TRUNCATE TABLE sections');
-  await pool.execute('TRUNCATE TABLE projects');
-  await pool.execute('TRUNCATE TABLE users');
+  
+  // Helper function to safely truncate tables (ignore if table doesn't exist)
+  const safeTruncate = async (tableName) => {
+    try {
+      await pool.execute(`TRUNCATE TABLE ${tableName}`);
+    } catch (error) {
+      // Ignore "table doesn't exist" errors
+      if (!error.message.includes("doesn't exist")) {
+        throw error;
+      }
+    }
+  };
+  
+  await safeTruncate('note_todos');
+  await safeTruncate('notes');
+  await safeTruncate('sections');
+  await safeTruncate('projects');
+  await safeTruncate('users');
+  
   await pool.execute('SET FOREIGN_KEY_CHECKS = 1');
 };
 
