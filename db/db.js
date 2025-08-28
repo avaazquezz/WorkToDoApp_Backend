@@ -39,6 +39,7 @@ const getPool = () => {
 const poolProxy = {
   query: (...args) => getPool().query(...args),
   execute: (...args) => getPool().execute(...args),
+  getConnection: (...args) => getPool().getConnection(...args),
   // allow explicit shutdown of the internal pool if needed
   end: async () => {
     if (internalPool) {
