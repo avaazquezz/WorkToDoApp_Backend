@@ -25,26 +25,83 @@ router.get('/:idSection', async (req, res) => {
   }
 });
 
-// Crear nueva sección               
+// Crear nueva sección (ruta general)             
 router.post('/', async (req, res) => {
   const { title, description, color, createdAt, project_id, user_id } = req.body;
 
   // Validar datos recibidos
-  if (!title || !description || !color || !createdAt || !project_id || !user_id) {
-    console.error('Error de validación: Faltan campos obligatorios.', req.body); // Log detallado
-    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  if (!title || !project_id || !user_id) {
+    console.error('Error de validación: Faltan campos obligatorios.', { 
+      projectId: project_id, 
+      body: req.body 
+    });
+    return res.status(400).json({ 
+      error: 'Los campos title, projectId (param) y user_id son obligatorios',
+      received: { projectId: project_id, body: req.body }
+    });
   }
 
-  console.log('Datos recibidos para crear sección:', req.body); // Log para depuración
+  const sectionData = {
+    title,
+    description: description || '',
+    color: color || '#3B82F6',
+    createdAt: createdAt || Date.now(),
+    project_id,
+    user_id
+  };
+
+  console.log('Datos para crear sección:', sectionData);
 
   try {
     const [result] = await pool.query(
       'INSERT INTO sections (title, description, color, createdAt, project_id, user_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [title, description, color, createdAt, project_id, user_id]
+      [sectionData.title, sectionData.description, sectionData.color, sectionData.createdAt, sectionData.project_id, sectionData.user_id]
     );
-    res.status(201).json({ idSection: result.insertId });
+    console.log('Sección creada con ID:', result.insertId);
+    res.status(201).json({ idSection: result.insertId, message: 'Sección creada exitosamente' });
   } catch (err) {
-    console.error('Error al insertar sección en la base de datos:', err.message, err.stack); // Log más detallado
+    console.error('Error al insertar sección en la base de datos:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor.', details: err.message });
+  }
+});
+
+// Crear nueva sección específica de un proyecto (ruta REST-style)
+router.post('/project/:projectId', async (req, res) => {
+  const { projectId } = req.params;
+  const { title, description, color, createdAt, user_id } = req.body;
+
+  // Validar datos recibidos
+  if (!title || !user_id) {
+    console.error('Error de validación: Faltan campos obligatorios.', { 
+      projectId, 
+      body: req.body 
+    });
+    return res.status(400).json({ 
+      error: 'Los campos title, projectId (param) y user_id son obligatorios',
+      received: { projectId, body: req.body }
+    });
+  }
+
+  const sectionData = {
+    title,
+    description: description || '',
+    color: color || '#3B82F6',
+    createdAt: createdAt || Date.now(),
+    project_id: parseInt(projectId),
+    user_id
+  };
+
+  console.log('Datos para crear sección en proyecto:', sectionData);
+
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO sections (title, description, color, createdAt, project_id, user_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [sectionData.title, sectionData.description, sectionData.color, sectionData.createdAt, sectionData.project_id, sectionData.user_id]
+    );
+    console.log('Sección creada con ID:', result.insertId);
+    res.status(201).json({ idSection: result.insertId, message: 'Sección creada exitosamente' });
+  } catch (err) {
+    console.error('Error al insertar sección en la base de datos:', err.message);
     res.status(500).json({ error: 'Error interno del servidor.', details: err.message });
   }
 });
