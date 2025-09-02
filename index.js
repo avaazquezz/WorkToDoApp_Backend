@@ -110,11 +110,11 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint no encontrado' });
 });
 
-app.listen(port, () => {
+app.listen(port,"0.0.0.0", () => {
   console.log('🔄 Loading routes...');
   console.log('✅ Projects routes loaded');
   console.log('✅ Auth routes loaded');
   console.log('✅ Sections routes loaded');
   console.log('✅ Notes routes loaded');
-  console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
+  console.log(`🚀 Servidor corriendo en puerto ${port}`);
 });
