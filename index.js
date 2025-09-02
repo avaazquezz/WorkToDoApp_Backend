@@ -5,8 +5,24 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Configuración de CORS
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
+
 // Middlewares
-app.use(cors());
 app.use(express.json());
 
 // Middleware de logging para debugging
@@ -16,6 +32,16 @@ app.use((req, res, next) => {
     console.log('Request body:', JSON.stringify(req.body, null, 2));
   }
   console.log('Request headers origin:', req.headers.origin);
+  
+  // Log de estado CORS
+  const origin = req.headers.origin;
+  if (origin) {
+    const isAllowed = allowedOrigins.includes(origin);
+    console.log(`🌐 CORS: Origin ${origin} ${isAllowed ? '✅ ALLOWED' : '❌ BLOCKED'}`);
+  } else {
+    console.log('🌐 CORS: No origin header (allowed for same-origin or tools like curl)');
+  }
+  
   next();
 });
 
